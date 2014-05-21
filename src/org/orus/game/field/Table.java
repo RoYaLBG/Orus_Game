@@ -16,8 +16,8 @@ public class Table extends JPanel implements Runnable, Variables {
 	private Player player;
 	private String backgroundImage = "../images/tableBackground.png";
 	private Image backgroundImg;
-	private Thread animation;
 	private boolean playing = true;
+	private Thread animation;
 
 	public Table() {
 		addKeyListener(new TAdapter());
@@ -28,6 +28,11 @@ public class Table extends JPanel implements Runnable, Variables {
 		initGame();
 		setDoubleBuffered(true);
 	}
+
+//	public void addNotify() {
+//		super.addNotify();
+//		initGame();
+//	}
 	
 	public void paintComponent(Graphics g) {
 
@@ -39,12 +44,11 @@ public class Table extends JPanel implements Runnable, Variables {
 		player = new Player();
 		
 		if (animation == null || !playing) {
-			animation = new Thread();
+			animation = new Thread(this);
 			animation.start();
 		}
 	}
 
-	//DRAW PLAYER
 	//DRAW FOOD
 	//PAINT ALL
 	public void drawPlayer(Graphics g) {
@@ -56,8 +60,9 @@ public class Table extends JPanel implements Runnable, Variables {
 	public void paint(Graphics g) {
 		super.paint(g);
 		
-		drawPlayer(g);
-		
+		if (playing) {
+			drawPlayer(g);
+		}
 		
 		Toolkit.getDefaultToolkit().sync();
 		g.dispose();
@@ -72,9 +77,9 @@ public class Table extends JPanel implements Runnable, Variables {
 		long timeDifference;
 		long sleep;		
 		
-		while (true) {
-			repaint();
+		while (playing) {
 			runAnimation();
+			repaint();
 			
 			timeDifference = System.currentTimeMillis() - initialTime;
 			sleep = delay - timeDifference;
@@ -94,16 +99,15 @@ public class Table extends JPanel implements Runnable, Variables {
 	}
 	
 	private class TAdapter extends KeyAdapter {
+
+		public void keyReleased(KeyEvent event) {
+			player.keyReleased(event);
+		}
 		
 		public void keyPressed(KeyEvent event) {
 			player.keyPressed(event);
 			
-			int x = player.getX();
-			int y = player.getY();
 		}
 		
-		public void keyReleased(KeyEvent event) {
-			player.keyReleased(event);
-		}
 	}
 }

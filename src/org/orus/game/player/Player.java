@@ -38,11 +38,11 @@ public class Player extends Sprite implements Variables {
 		int key = event.getKeyCode();
 		
 		if (key == KeyEvent.VK_LEFT) {
-			directionX = -2;
+			directionX = -4;
 		}
 		
 		if (key == KeyEvent.VK_RIGHT) {
-			directionX = 2;
+			directionX = 4;
 		}
 	}
 	
