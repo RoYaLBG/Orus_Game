@@ -5,20 +5,20 @@ import javax.swing.JFrame;
 import org.orus.game.field.Table;
 import org.orus.game.commons.Variables;;
 
-public class HungryPesho extends JFrame implements Variables {
+public class PeshoTheHungrySumist extends JFrame implements Variables {
 	
-	public HungryPesho() {
+	public PeshoTheHungrySumist() {
 		add(new Table());
 		
 		setVisible(true);
-		setTitle("Hungry Pesho - The Game");
+		setTitle("Pesho, The Hungry Sumist");
 		setSize(windowWidth, windowHeight);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
 	}	
 	
 	public static void main(String[] args) {
-		new HungryPesho();
+		new PeshoTheHungrySumist();
 	}
 
 }
