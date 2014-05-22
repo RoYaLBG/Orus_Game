@@ -49,6 +49,13 @@ public class Sprite {
 
 	public void setY(int y) {
 		this.y = y;
-	}	
-
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
+	}
 }

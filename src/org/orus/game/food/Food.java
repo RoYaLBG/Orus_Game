@@ -1,4 +1,6 @@
 package org.orus.game.food;
+import java.awt.Rectangle;
+
 import org.orus.game.commons.*;
 
 public class Food extends Sprite {
@@ -20,5 +22,9 @@ public class Food extends Sprite {
 	
 	public boolean isEaten() {
 		return eaten;
+	}
+	
+	public Rectangle getBounds() {
+		return new Rectangle(x, y, 33, 30);
 	}
 }
