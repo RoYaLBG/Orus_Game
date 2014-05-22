@@ -1,5 +1,8 @@
 package org.orus.game.field;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Rectangle;
@@ -21,12 +24,20 @@ import org.orus.game.player.Player;
 public class Table extends JPanel implements Runnable, Variables, FoodsCollection {
 	private Player player;
 	private Food food;
+	private ArrayList<Food> foods;
+	
 	String[] fruitsCollection = {foodAnanas, foodBanana, foodPear, foodWaterMelon};
 	String[] normalFoodCollection = {foodCake, foodCheese, foodDonuts, foodSomeFood};
-	private ArrayList<Food> foods;
+	
+	private int initialFoodSupply = 60;
+	private int score = 0;
+	private int fatnessLevel = 0;
+	
 	private Image backgroundImg;
 	private String backgroundImage = "../images/tableBackground.png";
+	
 	private boolean playing = true;
+	public boolean isFat = false;
 	
 	private Thread animation;
 	
@@ -39,11 +50,6 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 		initGame();
 		setDoubleBuffered(true);
 	}
-
-//	public void addNotify() {
-//		super.addNotify();
-//		initGame();
-//	}
 	
 	public void paintComponent(Graphics g) {
 
@@ -55,6 +61,15 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 		foods = new ArrayList<Food>();
 		player = new Player();
 		
+		generateFood(initialFoodSupply);
+		
+		if (animation == null || !playing) {
+			animation = new Thread(this);
+			animation.start();
+		}
+	}
+
+	public void generateFood(int foodSupply) {
 		Random rnd = new Random();
 		String foodType;
 		ImageIcon icon;
@@ -62,17 +77,17 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 		int foodTypeChoice;
 		int spawnPosition;
 		
-		for (int i = 0; i <= 30; i++) {
+		for (int i = 0; i <= foodSupply; i++) {
 			foodChoice = rnd.nextInt(4);
-			foodTypeChoice = rnd.nextInt(2);
-			spawnPosition = 5 + rnd.nextInt(windowWidth - 5);
+			foodTypeChoice = rnd.nextInt(200);
+			spawnPosition = 5 + rnd.nextInt(windowWidth - 50);
 			
-			if (foodChoice == 0) {
+			if (foodTypeChoice <= 12) {
 				foodType = "fruit";
 				icon = new ImageIcon(getClass().getResource(fruitsCollection[foodChoice]));
 				
 			} else {
-				foodType = "normal";
+				foodType = "fatFood";
 				icon = new ImageIcon(getClass().getResource(normalFoodCollection[foodChoice]));
 			}
 			
@@ -80,14 +95,7 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 			food.setImage(icon.getImage());
 			foods.add(food);
 		}
-		
-		if (animation == null || !playing) {
-			animation = new Thread(this);
-			animation.start();
-		}
 	}
-	
-	//COLLISION CHECK
 	
 	public void drawPlayer(Graphics g) {
 		if (player.isVisible()) {
@@ -96,6 +104,10 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 	}
 	
 	public void drawFood(Graphics g) {
+		if (foods.size() < initialFoodSupply) {
+			generateFood(initialFoodSupply - foods.size());
+		}
+
 		Iterator iter = foods.iterator();
 		
 		while(iter.hasNext()) {
@@ -113,6 +125,7 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 		if (playing) {
 			drawPlayer(g);
 			drawFood(g);
+			displayResult();
 		}
 		
 		Toolkit.getDefaultToolkit().sync();
@@ -128,18 +141,82 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 			Rectangle foodBounds = food.getBounds();
 			
 			if (playerBounds.intersects(foodBounds)) {
-				food.setVisible(false);
+				food.setEaten(true);
+				
+				if (food.getType().equals("fatFood")) {
+					fatnessLevel++;
+					score += 5;
+				} else {
+					fatnessLevel -= 10;
+					score += 20;
+				}
+				
+				if (fatnessLevel < 0) {
+					fatnessLevel = 0;
+				}
+				
+				if (fatnessLevel > 50 && !isFat) {
+					isFat = true;
+					ImageIcon icon = new ImageIcon(getClass().getResource("../images/bigMan.png"));
+					player.setImage(icon.getImage());
+					player.setY(player.getY() - 40);
+					player.setWidth(100);
+					player.setHeight(105);
+					player.setBounds(player.getX(), player.getY(), 0, 0);
+					
+				} else if (fatnessLevel <= 50 && isFat) {
+					isFat = false;
+					ImageIcon icon = new ImageIcon(getClass().getResource("../images/littleMan.png"));
+					player.setImage(icon.getImage());
+					player.setY(player.getY() + 40);
+					player.setWidth(60);
+					player.setHeight(60);
+					player.setBounds(player.getX(), player.getY(), 0, 0);
+				}
+				
+				if (fatnessLevel >= 200) {
+					playing = false;
+				}
 			}
 		}
 	}
 	
+	public void displayResult() {
+		Graphics g = this.getGraphics();
+		
+		Font someFont = new Font("Helvetica", Font.BOLD, 16);
+		FontMetrics metrics = this.getFontMetrics(someFont);
+		
+		g.setColor(Color.WHITE);
+		g.setFont(someFont);
+		g.drawString("Fattness Level: " + String.valueOf(fatnessLevel), 100, 15);
+		g.drawString("Score: " + String.valueOf(score), 10, 15);
+	}
+	
+	public void gameOver() {
+		Graphics g = this.getGraphics();
+		
+		g.setColor(Color.BLACK);
+		g.fillRect(windowWidth / 2 - 160, windowHeight / 2 - 120, 300, 150);
+		
+		Font small = new Font("Helvetica", Font.BOLD, 20);
+        FontMetrics metrics = this.getFontMetrics(small);
+		
+        g.setFont(small);
+		g.setColor(Color.WHITE);
+		g.drawString("TOO... MUCH... FOOD!", windowWidth / 2 - 115, windowHeight / 2 - 60);
+		
+		g.setColor(Color.RED);
+		g.drawString("GAME OVER!!!", windowWidth / 2 - 75, windowHeight / 2 - 30);
+		
+	}
+	
 	public void runAnimation() {
 		player.move();
-		
 		for (int i = 0; i < foods.size(); i++) {
 			Food food = foods.get(i);
 			
-			if(food.isVisible()) {
+			if(!food.isEaten()) {
 				food.fall(3);
 			} else {
 				foods.remove(i);
@@ -173,6 +250,8 @@ public class Table extends JPanel implements Runnable, Variables, FoodsCollectio
 			
 			initialTime = System.currentTimeMillis();			
 		}
+		
+		gameOver();
 	}
 	
 	private class TAdapter extends KeyAdapter {

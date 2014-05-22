@@ -10,20 +10,24 @@ import org.orus.game.commons.*;
 public class Player extends Sprite implements Variables {
 	private int initialX = windowWidth / 2;
 	private int initialY = windowHeight - ground;
-	private final String player = "../images/littleMan.png";
+	
 	private int playerWidth;
 	private int playerHeight;
 	
+	private Rectangle bounds;
+	private final String player = "../images/littleMan.png";
+	
 	public Player() {
 		ImageIcon icon = new ImageIcon(this.getClass().getResource(player));
-		playerWidth = icon.getImage().getWidth(null);
-		playerHeight = icon.getImage().getHeight(null);
-		initialX -= playerWidth;
+		setWidth(icon.getImage().getWidth(null));
+		setHeight(icon.getImage().getHeight(null));
 		
+		initialX -= getWidth();
 		
 		setImage(icon.getImage());
 		setX(initialX);
 		setY(initialY);
+
 	}
 	
 	public void move() {
@@ -33,13 +37,19 @@ public class Player extends Sprite implements Variables {
 			x = 10;
 		}
 		
-		if (x >= windowWidth - playerWidth - 50) {
-			x = windowWidth - playerWidth - 50;
+		if (x >= windowWidth - getWidth() - 40) {
+			x = windowWidth - getWidth() - 40;
 		}
+		
+		setBounds(x, y, getWidth(), getHeight());
+	}
+	
+	public void setBounds(int x, int y, int playerWidth, int playerHeight) {
+		this.bounds = new Rectangle(x, y, playerWidth, playerHeight);
 	}
 	
 	public Rectangle getBounds() {
-		return new Rectangle(x, y, playerWidth, playerHeight);
+		return bounds;
 	}
 	
 	public void keyPressed(KeyEvent event) {
