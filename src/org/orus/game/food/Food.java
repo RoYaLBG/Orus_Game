@@ -1,7 +1,9 @@
 package org.orus.game.food;
+import java.awt.Rectangle;
+
 import org.orus.game.commons.*;
 
-public class Food extends Sprite {
+public class Food extends Sprite implements Variables {
 	private boolean eaten;
 	
 	public Food(int x, int y, String type) {
@@ -12,6 +14,10 @@ public class Food extends Sprite {
 	
 	public void fall(int direction) {
 		this.y += direction;
+		
+		if (y > windowHeight) {
+			y = 0;
+		}
 	}
 	
 	public void setEaten(boolean eaten) {
@@ -20,5 +26,9 @@ public class Food extends Sprite {
 	
 	public boolean isEaten() {
 		return eaten;
+	}
+	
+	public Rectangle getBounds() {
+		return new Rectangle(x, y, 33, 30);
 	}
 }

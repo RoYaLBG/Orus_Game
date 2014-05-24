@@ -1,6 +1,8 @@
 package org.orus.game.player;
 
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
+
 import javax.swing.ImageIcon;
 
 import org.orus.game.commons.*;
@@ -8,41 +10,57 @@ import org.orus.game.commons.*;
 public class Player extends Sprite implements Variables {
 	private int initialX = windowWidth / 2;
 	private int initialY = windowHeight - ground;
-	private final String player = "../images/littleMan.png";
+	
 	private int playerWidth;
+	private int playerHeight;
+	
+	private Rectangle bounds;
+	private final String player = "../images/littleMan.png";
 	
 	public Player() {
 		ImageIcon icon = new ImageIcon(this.getClass().getResource(player));
-		playerWidth = icon.getImage().getWidth(null);
-		initialX -= playerWidth;
+		setWidth(icon.getImage().getWidth(null));
+		setHeight(icon.getImage().getHeight(null));
 		
+		initialX -= getWidth();
 		
 		setImage(icon.getImage());
 		setX(initialX);
 		setY(initialY);
+
 	}
 	
 	public void move() {
 		x += directionX;
 		
-		if (x <= 2) {
-			x = 2;
+		if (x <= 10) {
+			x = 10;
 		}
 		
-		if (x >= 700 - playerWidth) {
-			x = 700 - playerWidth;
+		if (x >= windowWidth - getWidth() - 40) {
+			x = windowWidth - getWidth() - 40;
 		}
+		
+		setBounds(x, y, getWidth(), getHeight());
+	}
+	
+	public void setBounds(int x, int y, int playerWidth, int playerHeight) {
+		this.bounds = new Rectangle(x, y, playerWidth, playerHeight);
+	}
+	
+	public Rectangle getBounds() {
+		return bounds;
 	}
 	
 	public void keyPressed(KeyEvent event) {
 		int key = event.getKeyCode();
 		
 		if (key == KeyEvent.VK_LEFT) {
-			directionX = -2;
+			directionX = -4;
 		}
 		
 		if (key == KeyEvent.VK_RIGHT) {
-			directionX = 2;
+			directionX = 4;
 		}
 	}
 	

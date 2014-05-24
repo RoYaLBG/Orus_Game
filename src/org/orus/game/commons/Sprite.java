@@ -3,12 +3,18 @@ package org.orus.game.commons;
 import java.awt.Image;
 
 public class Sprite {
-	private boolean visible;
 	private Image img;
+	protected String type;
+	
+	private boolean visible;
+	protected boolean dying;
+	
 	protected int x;
 	protected int y;
-	protected String type;
-	protected boolean dying;
+	
+	protected int width;
+	protected int height;
+	
 	protected int directionX;
 	
 	public Sprite() {
@@ -49,6 +55,29 @@ public class Sprite {
 
 	public void setY(int y) {
 		this.y = y;
-	}	
-
+	}
+	
+	public void setWidth(int width) {
+		this.width = width;
+	}
+	
+	public int getWidth() {
+		return width;
+	}
+	
+	public void setHeight(int height) {
+		this.height = height;
+	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public void setType(String type) {
+		this.type = type;
+	}
+	
+	public String getType() {
+		return type;
+	}
 }
